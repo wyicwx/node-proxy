@@ -1,0 +1,8 @@
+module.exports = {
+	// '\w*\\.js' : 'E:\\album\\album.js',
+	'album_\\w*\\.js' : 'E:\\album-git\\album\.js',
+	// 'ab_plist_\\w*\\.js' : 'E:\\album\\ab_plist\.js',
+	// 'ab_pview_\\w*\\.js' : 'E:\\album\\ab_pview\.js',
+	// 'mi.PicList_\\w*\\.js' : 'E:\\album\\20120726\\mi\.PicList_weixinchen\.js'
+	'mi.PicList_\\w*\\.js' : 'E:\\album-git\\mi\.PicList_weixinchen\.js'
+}
