@@ -16,7 +16,7 @@ var http = require('http'),
 
 function reply(request, response) {
 	var options = url.parse(request.url),
-		wgetObj;
+		wgetObj, dataBuffers = new Buffers();
 
     options.method = request.method;
     options.headers = request.headers;
@@ -26,6 +26,7 @@ function reply(request, response) {
 		response.writeHead(res.statusCode, res.headers);
 		res.on('data', function(chunk) {
 			if(config.slowLoad) {
+				dataBuffers.write(chunk);
 				setTimeout(function() {
 					response.write(chunk, 'binary');
 				}, config.slowTime);
@@ -39,6 +40,11 @@ function reply(request, response) {
 				setTimeout(function() {
 					response.end();
 				}, config.slowTime);
+				// setTimeout(function() {
+				// 	var length = dataBuffers.length;
+				// 	var times = length / config.slowTime;
+					
+				// },config.slowTime);
 			} else {
 				response.end();
 			}
