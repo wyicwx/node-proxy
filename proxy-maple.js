@@ -13,38 +13,88 @@ var http = require('http'),
     },
     config = require("./config.js");
 
+function sendBuffer() {
+	this.buffer;
+	this.size;
+	this._getChunkSize = 0;
+}
+
+sendBuffer.prototype.addChunk = function(chunk) {
+	if(!this.buffer) {
+		this.buffer = chunk;
+	} else {
+		var oldBuffer = this.buffer;
+		this.buffer = new Buffer(oldBuffer.length + chunk.length);
+		oldBuffer.copy(this.buffer);
+		chunk.copy(this.buffer, oldBuffer.length);
+	}
+	this.size = this.buffer.length;
+	return this;
+}
+
+sendBuffer.prototype.getChunk = function(byteSize) {
+	// console.log("currentChunkSize:"+this._getChunkSize);
+	// console.log("BufferSize:"+this.size);
+	if(this._getChunkSize+byteSize >= this.size) {
+		if(this._getChunkSize == this.size) {
+			return false;
+		}
+		var buffer = this.buffer.slice(this._getChunkSize, this.size);
+		this._getChunkSize = this.size;
+		return buffer;
+	}
+	var buffer = this.buffer.slice(this._getChunkSize, this._getChunkSize+byteSize);
+	this._getChunkSize = this._getChunkSize+byteSize;
+	return buffer;
+}
+
+
 
 function reply(request, response) {
 	var options = url.parse(request.url),
-		wgetObj, dataBuffers = new Buffers();
+		wgetObj, dataBuffers, interval ;
 
     options.method = request.method;
     options.headers = request.headers;
     options.port = 80;
 
 	wgetObj = http.request(options, function(res) {
+
 		response.writeHead(res.statusCode, res.headers);
+
 		res.on('data', function(chunk) {
 			if(config.slowLoad) {
-				dataBuffers.write(chunk);
-				setTimeout(function() {
-					response.write(chunk, 'binary');
-				}, config.slowTime);
+				
+				if(!dataBuffers) {
+					dataBuffers = new sendBuffer();
+				}
+				dataBuffers.addChunk(chunk);
+
 			} else {
 				response.write(chunk, 'binary');
 			}
-			
 		});
 		res.on('end', function() {
+
 			if(config.slowLoad) {
-				setTimeout(function() {
-					response.end();
-				}, config.slowTime);
+				
+				interval = setInterval(function() {
+					if(!dataBuffers) {
+						response.end();
+						return false;
+					}
+					var chunk = dataBuffers.getChunk(config.slowBlockByte);
+					if(!chunk) {
+						clearInterval(interval);
+						response.end();
+						return;
+					}
+					response.write(chunk);
+				}, config.slowTimeInterval);
+
 				// setTimeout(function() {
-				// 	var length = dataBuffers.length;
-				// 	var times = length / config.slowTime;
-					
-				// },config.slowTime);
+				// 	response.end();
+				// }, 2000);
 			} else {
 				response.end();
 			}
@@ -54,6 +104,7 @@ function reply(request, response) {
 
 	wgetObj.on('error', function (e) {
       console.log(e);
+      return;
     });
     wgetObj.end();
 }
@@ -100,3 +151,8 @@ http.createServer(function (request, response) {
     }
 
 }).listen(8080);
+
+
+if(config.slowLoad) {
+	console.log("slow mode");
+}

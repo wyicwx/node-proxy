@@ -1,4 +1,5 @@
 module.exports = {
-	slowLoad : false,
-	slowTime : 1000
+	slowLoad : true,
+	slowBlockByte : 1024 * 1,
+	slowTimeInterval : 100
 }
