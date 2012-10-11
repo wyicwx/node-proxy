@@ -1,5 +1,6 @@
 module.exports = {
-	slowLoad : true,
+	slowLoad : false,
 	slowBlockByte : 1024 * 1,
-	slowTimeInterval : 100
+	slowTimeInterval : 100,
+	focusRefresh : false
 }

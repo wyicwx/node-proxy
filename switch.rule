@@ -1,8 +1,8 @@
 module.exports = {
-	// '\w*\\.js' : 'E:\\album\\album.js',
-	'album_\\w*\\.js' : 'E:\\album-git\\album\.js',
-	// 'ab_plist_\\w*\\.js' : 'E:\\album\\ab_plist\.js',
-	// 'ab_pview_\\w*\\.js' : 'E:\\album\\ab_pview\.js',
-	// 'mi.PicList_\\w*\\.js' : 'E:\\album\\20120726\\mi\.PicList_weixinchen\.js'
-	'mi.PicList_\\w*\\.js' : 'E:\\album-git\\mi\.PicList_weixinchen\.js'
+	'js_MP/config/config.js' : '/home/maple/svn/xipangsns/branch/base/public/js_MP/config/config.js',
+	'js_MP/libs/Base.js' : '/home/maple/svn/xipangsns/branch/base/public/js_MP/libs/Base.js',
+	'js_MP/libs/global.js' : '/home/maple/svn/xipangsns/branch/base/public/js_MP/libs/global.js',
+	'js_MP/libs/Utils.js' : '/home/maple/svn/xipangsns/branch/base/public/js_MP/libs/Utils.js',
+	'js_MP/libs/TalkList.js' : '/home/maple/svn/xipangsns/branch/base/public/js_MP/libs/TalkList.js',
+	'js_MP/tpl/TalkList.html' : '/home/maple/svn/xipangsns/branch/base/public/js_MP/tpl/TalkList.html'
 }

@@ -52,10 +52,16 @@ sendBuffer.prototype.getChunk = function(byteSize) {
 
 function reply(request, response) {
 	var options = url.parse(request.url),
-		wgetObj, dataBuffers, interval ;
+		wgetObj, dataBuffers, interval, buffer;
 
     options.method = request.method;
     options.headers = request.headers;
+    if(options.method.toLowerCase == "get") {
+		if(config.focusRefresh) {
+			options.headers['If-Modified-Since'] = 'Thu, 16 Aug 1970 00:00:00 GMT';
+			options.headers['Cache-Control'] = 'max-age=0';
+	    }
+	}
     options.port = 80;
 
 	wgetObj = http.request(options, function(res) {
@@ -100,13 +106,28 @@ function reply(request, response) {
 			}
 			
 		});
-	})
 
+	});
+
+	request.on('data', function(data) {
+		if(buffer) {
+			buffer += data;
+		} else {
+			buffer = data;
+		}
+	});
+
+	request.on('end',function(data) {
+		wgetObj.write(buffer||'');
+		wgetObj.end();
+	})
+	
 	wgetObj.on('error', function (e) {
       console.log(e);
       return;
     });
-    wgetObj.end();
+
+    
 }
 
 function getResponse(response) {
@@ -155,4 +176,7 @@ http.createServer(function (request, response) {
 
 if(config.slowLoad) {
 	console.log("slow mode");
+}
+if(config.focusRefresh) {
+	console.log("focusRefresh");
 }
