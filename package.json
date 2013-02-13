@@ -1,0 +1,17 @@
+{
+  "name": "node-proxy",
+  "description": "简易的代理工具",
+  "version": "0.1.0",
+  "author": "Chen Weixin <wyicwx@gmail.com> (http://weibo.com/236008243)",
+  "dependencies": {
+    "mime": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/wyicwx/node-proxy.git"
+  },
+  "main": "proxy",
+  "engines": {
+    "node": "*"
+  }
+}
