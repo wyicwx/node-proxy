@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git://github.com/wyicwx/node-proxy.git"
   },
-  "main": "proxy",
+  "main": "main.js",
   "engines": {
     "node": "*"
   }
