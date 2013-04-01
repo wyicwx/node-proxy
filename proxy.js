@@ -46,7 +46,7 @@ sBuffer.prototype._getChunk = function(byteSize) {
 }
 
 sBuffer.prototype.isStop = function() {
-    return this._getChunkSize == this.size;
+    return this._getChunkSize >= this.size;
 }
 
 sBuffer.prototype.send = function(byteSize, interval, response) {
@@ -59,7 +59,7 @@ sBuffer.prototype.send = function(byteSize, interval, response) {
         } else {
             var chunk = self._getChunk(byteSize);
             if(chunk) {
-                response.write(chunk, 'binary');
+                response.write(chunk);
             }
         }
     }, interval);
@@ -76,7 +76,7 @@ function _getResponseHeader() {
 exports.reply = function(request, response) {
     var options = url.parse(request.url),
         wgetObj, postData, dataBuffers, interval;
- 
+
     options.method = request.method;
     options.headers = request.headers;
     options.port = 80;
@@ -84,8 +84,25 @@ exports.reply = function(request, response) {
         options.headers['If-Modified-Since'] = 'Thu, 16 Aug 1970 00:00:00 GMT';
         options.headers['Cache-Control'] = 'max-age=0';
     }
+
+    //处理post的数据
+    request.on('data', function(data) {
+        if(postData) {
+            postData += data;
+        } else {
+            postData = data;
+        }
+    });
  
-    wgetObj = http.request(options, function(res) {
+    request.on('end',function() {
+        wgetObj.write(postData || '');
+        wgetObj.end();
+    })
+
+     wgetObj = http.request(options, function(res) {
+
+        global.nodeProxy.socket.sockets.emit('realtime_pend', {'id': request.proxyIndex});
+
         if(config.focusRefresh) {
             res.headers['Cache-Control'] = 'max-age=0';
         }
@@ -109,25 +126,21 @@ exports.reply = function(request, response) {
             } else {
                 response.end();
             }
+            // send flag of final
+            global.nodeProxy.socket.sockets.emit('realtime_final', {'id': request.proxyIndex, statusCode: res.statusCode});
         });
  
     });
-    //处理post的数据
-    request.on('data', function(data) {
-        if(postData) {
-            postData += data;
-        } else {
-            postData = data;
-        }
-    });
- 
-    request.on('end',function() {
-        wgetObj.write(postData || '');
-        wgetObj.end();
-    })
- 
+
     //请求失败输出log
     wgetObj.on('error', function (e) {
+        if(e.code == 'ENOTFOUND') {
+            // 404
+            global.nodeProxy.socket.sockets.emit('realtime_error', {'id': request.proxyIndex, 'statusCode': 404});
+        } else {
+            //send flag of error 
+            global.nodeProxy.socket.sockets.emit('realtime_error', {'id': request.proxyIndex, 'statusCode': 500});
+        }
       console.log(e);
       return;
     });
@@ -137,17 +150,20 @@ exports.reply = function(request, response) {
 exports.getReplaceFile = function(request) {
     var urlObj, list = global.nodeProxy.replaceList;
     urlObj = url.parse(request.url);
+    //send connect status
     global.nodeProxy.socket.sockets.emit('realtime_send', {'id': request.proxyIndex, 'data': urlObj});
     for(var i in list) {
-        if(list[i]['enabled'] && list[i].fileName.test(urlObj.href)) {
-            return list[i].filePath;
+        if(list[i]['enabled'] == false) continue;
+        if(list[i]['match'].test(urlObj.href)) {
+            return list[i];
         }
     }
     return false;
 }
 
-exports.replaceFile = function(filePath, response) {
+exports.replaceFile = function(request, response, fileInfo) {
     var headers = _getResponseHeader(),
+        filePath = fileInfo['respond'],
         ext, fileSteam, dataBuffers;
 
     try {
@@ -167,8 +183,9 @@ exports.replaceFile = function(filePath, response) {
         dataBuffers.stopMark();
         dataBuffers.send(config.slowBlockByte, config.slowTimeInterval, response);
     } else {
-       response.write(fileSteam);
-       response.end();
+        response.write(fileSteam);
+        response.end();
     }
-    console.log("SUCCESS: replace '" + filePath + "'");
+    //send flag of replaced 
+    global.nodeProxy.socket.sockets.emit('realtime_replaced', {'id': request.proxyIndex, 'match': fileInfo['originalMatch']});
 }

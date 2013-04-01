@@ -17,10 +17,12 @@ function clone(obj) {
 }
 
 exports.dealList = function(list) {
-	var newList = [];
+	var newList = [], tmp;
 	for(var i in list) {
-		newList[i] = clone(list[i]);
-        newList[i]['fileName'] = this.dealStr(newList[i]['fileName']);
+		tmp = clone(list[i]);
+		tmp['match'] = this.dealStr(i);
+		tmp['originalMatch'] = i;
+		newList.push(tmp);
     }
     return newList;
 }

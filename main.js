@@ -15,15 +15,16 @@ var proxy = require('./proxy.js');
 var server = http.createServer(function (request, response) {
     request.proxyIndex = index++;
     if(request.headers.host.search('127.0.0.1') != -1) {
+        console.log(request);
         return response.end();
     }
-    var result = proxy.getReplaceFile(request);     //请求是否在替换list内
+    var result = proxy.getReplaceFile(request, response);     //请求是否在替换list内
     if(result) {
-        proxy.replaceFile(result, response);
+        proxy.replaceFile(request, response, result);
     } else {
         proxy.reply(request, response);    //发起http请求并返回给本机
     }
 }).listen(config.port);
 
-global.nodeProxy.socket = require('./socket.js')(server);
+global.nodeProxy.socket = require('./socket.js')(server, false);
 // global.nodeProxy.socket.set('log level', 1); 

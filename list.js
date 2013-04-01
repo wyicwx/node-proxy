@@ -1,7 +1,6 @@
-module.exports = [
-    {
+module.exports = {
+    "aa": {
         "enabled": true,
-        "fileName": "hello",
-        "filePath": "world"
+        "respond": "aa"
     }
-]
+}
