@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "author": "Chen Weixin <wyicwx@gmail.com> (http://weibo.com/236008243)",
   "dependencies": {
-    "mime": "*",
-    "socket.io": "*"
+    "socket.io": "*",
+    "express": "3.x"
   },
   "repository": {
     "type": "git",

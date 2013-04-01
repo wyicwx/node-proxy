@@ -1,5 +1,4 @@
-var mime = require('mime'),
-    fs = require('fs'),
+var fs = require('fs'),
     url = require('url'),
     http = require('http'),
     config = global.nodeProxy.config;

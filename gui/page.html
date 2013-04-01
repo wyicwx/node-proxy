@@ -1,0 +1,190 @@
+<!doctype html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>实时列表</title>
+	<link rel="stylesheet" type="text/css" href="./base.css">
+	<link rel="stylesheet" href="./tpl.css">
+	<script type="text/javascript" src="./jquery-1.9.0.js"></script>
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+	<style type="text/css">
+	a {
+		color: rgb(48, 57, 66);
+	}
+	#navigation {
+		height: 100%;
+		left: 0;
+		position: fixed;
+		right: 15px;
+		width: 155px;
+		z-index: 3;
+	}
+	#navigation h1 {
+		-webkit-margin-after: 1em;
+		-webkit-margin-before: 21px;
+		-webkit-margin-start: 23px;
+		color: rgb(92, 97, 102);
+		font-size: 1.5em;
+		line-height: 1em;
+	}
+	#container {
+		position: relative;
+		margin-left: 155px;
+		width: 738px;
+		color: rgb(48, 57, 66);
+	}
+	#container .page {
+		padding-top: 55px;
+	}
+	#container>div {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 738px;
+		margin-left: -20px;
+		-webkit-transition: margin 100ms, opacity 100ms, visibility 200ms;
+		opacity: 0;
+		z-index: 1;
+		visibility: hidden;
+	}
+	#container>div header {
+		margin-left: 20px;
+		-webkit-transition: margin 200ms;
+		-webkit-transition-delay: 100ms;
+	}
+	#container>div.selected {
+		margin-left: 0;
+		-webkit-transition: margin 200ms, opacity 200ms, visibility 200ms;
+		-webkit-transition-delay: 100ms;
+		opacity: 1;
+		z-index: 2;
+		visibility: visible;
+	}
+	#container>div.selected header {
+		margin-left: 0;
+		opacity: 1;
+		-webkit-transition: margin 200ms, opacity 200ms;
+		-webkit-transition-delay: 100ms;
+	}
+	.sideBar {
+		position: fixed;
+		left: 913px;
+		top: 0px;
+		width: 400px;
+		height: 100%;
+		box-shadow: -5px 0px 8px rgb(221, 217, 217);
+		margin-left: 30px;
+		opacity: 0;
+		-webkit-transition: margin 200ms,opacity 200ms;
+	}
+	.sideBar.selected {
+		opacity: 1;
+		margin-left: 20px;
+		-webkit-transition: margin 200ms,opacity 200ms;
+		-webkit-transition-delay: 100ms;
+	}
+	/* http list */
+	#list {
+		width: 100%;
+		position: relative;
+	}
+	.url, .status {
+		display: block;
+		white-space: nowrap;
+		overflow: hidden;
+		float: left;
+	}
+	.url {
+		width: 89%;
+	}
+	.status {
+		text-align: center;
+		width: 10%;
+	}
+	.separation {
+		display: block;
+		float: left;
+		color: white;
+		cursor: ew-resize;
+	}
+	#list li {
+		border-bottom: 1px solid white;
+		margin-bottom: 1px;
+		color: rgb(48, 57, 66);
+	}
+	#list li:after {
+		visibility: hidden;
+		display: block;
+		font-size: 0;
+		content: " ";
+		clear: both;
+		height: 0;
+	}
+	#list li:hover {
+		background-color: rgb(252, 252, 252);
+	}
+	#list li.checked {
+		background-color: rgb(252, 252, 252);
+		color: #354651;
+	}
+	#list li.success {
+		border-bottom: 1px solid green;
+		margin: 0px;
+	}
+	#list li.error {
+		border-bottom: 1px solid red;
+		margin: 0px;
+	}
+
+
+	</style>
+</head>
+<body>
+	<!-- #navigation -->
+	<div id="navigation">
+		<h1>Toolkit</h1>
+		<ul class="ui-side-nav j-menu">
+<!-- 			<li class="selected" id='HttpList'>
+				<button>http列表</button>
+			</li>
+			<li id='AutoResponder'>
+				<button>AutoResponder</button>
+			</li> -->
+		</ul>
+	</div>
+	<!-- #navigation -->
+
+	<!-- #container -->
+	<div id="container" class="j-container">
+
+		<!-- <div class="j-HttpList selected">
+			<header class="ui-page-header">
+				<h1>http列表</h1>
+			</header>
+
+			<div class="page">
+				<ul id="list" class="fn-clear">
+					
+					<li class="checked">
+						<span class="url">https://www.google.com.hk/search?q=sublime+text+2+vim%E6%A8%A1%E5%BC%8F&aq=f&oq=sublime+text+2+vim%E6%A8%A1%E5%BC%8F&aqs=chrome.0.57j61j62l2.8307&sourceid=chrome&ie=UTF-8</span>
+						<span class="separation">|</span>
+						<span class="status">200</span>
+					</li> 
+				</ul>
+			</div>
+		</div> -->
+	</div>
+	<!-- #container -->
+
+	<!-- #side -->
+	<div class="sideBar">
+		<header></header>
+	</div>
+	<!-- #side -->
+</body>
+<script type="text/javascript" src="./config.js"></script>
+<script type="text/javascript" src="./utils.js"></script>
+<script type="text/javascript" src="./base.js"></script>
+<!-- <script type="text/javascript" src="./page.js"></script> -->
+<script type="text/javascript" src="./module.js"></script>
+</html>

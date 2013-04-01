@@ -1,7 +1,11 @@
-var http = require('http'),
+var express = require('express'),
+    http = require('http'),
+    fs = require('fs'),
     config = require('./config.js'),
     list = require('./list.js'),
     utils = require('./utils.js'),
+    app = express(),
+    server = require('http').Server(app),
     index = 0;
 
 global.nodeProxy = {
@@ -12,7 +16,13 @@ global.nodeProxy = {
 
 var proxy = require('./proxy.js');
 
-var server = http.createServer(function (request, response) {
+app.use(express.static(__dirname + '/gui'));
+app.get('/gui', function(request, response, next) {
+    var page = fs.readFileSync(__dirname + "/gui/page.html");
+    return response.end(page);
+});
+
+app.all('*', function(request, response) {
     request.proxyIndex = index++;
     if(request.headers.host.search('127.0.0.1') != -1) {
         console.log(request);
@@ -24,7 +34,8 @@ var server = http.createServer(function (request, response) {
     } else {
         proxy.reply(request, response);    //发起http请求并返回给本机
     }
-}).listen(config.port);
+});
 
 global.nodeProxy.socket = require('./socket.js')(server, false);
-// global.nodeProxy.socket.set('log level', 1); 
+
+server.listen(config.port);
